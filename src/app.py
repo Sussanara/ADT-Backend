@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from models import db,Admin, User, Product
-
+from flask_cors import CORS
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['ENV'] = 'development'
@@ -11,6 +11,7 @@ app.config['JSON_SORT_KEYS'] = False
 
 db.init_app(app)
 Migrate(app,db)
+CORS(app)
 
 #GET ALL ADMINS
 @app.route('/api/admin', methods = ['GET'])
