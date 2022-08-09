@@ -23,8 +23,3 @@ yarn-debug.log*
 yarn-error.log*
 
 #database related
-/migrations
-Pipfile.lock
-src\database.db
-/src/__pycache__
-/node_modules
