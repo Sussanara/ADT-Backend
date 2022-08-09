@@ -49,8 +49,8 @@ def get_and_post_users_with_products():
         return jsonify(all_users),200
     
 
-#GET USER BY ID , POST PRODUCT <--- En esta ruta se recibe un Usuario por ID y se AGREGAN productos mediante POST
-@app.route('/api/users/<int:id>', methods = ['GET','POST','PUT'])
+#GET USER BY ID , EDIT USER, POST PRODUCT , DELETE USER
+@app.route('/api/users/<int:id>', methods = ['GET','POST','PUT','DELETE'])
 def get_edit_postProduct_user_by_id(id):
     #Get User by ID
     if request.method == 'GET':
@@ -82,6 +82,12 @@ def get_edit_postProduct_user_by_id(id):
         user.update()
         users = User.query.all()
         return jsonify(list(map(lambda user: user.serialize(),users))),200
+
+    if request.method == 'DELETE':
+        user = User.query.get(id)
+        user.delete()
+        all_users = User.query.all()
+        return jsonify(list(map(lambda user: user.serialize(),all_users)))
 
     #Post Product
     if request.method == 'POST':
