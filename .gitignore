@@ -27,3 +27,4 @@ yarn-error.log*
 Pipfile.lock
 src\database.db
 /src/__pycache__
+/node_modules
