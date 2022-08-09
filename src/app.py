@@ -79,7 +79,8 @@ def get_edit_postProduct_user_by_id(id):
         user.is_active = new_is_active
         
         user.update()
-        return jsonify(user.serialize()),200
+        users = User.query.all()
+        return jsonify(list(map(lambda user: user.serialize(),users))),200
 
     #Post Product
     if request.method == 'POST':
