@@ -29,6 +29,19 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     products = db.relationship('Product', backref='user')
 
+    def serialize(self):
+        return{
+            "id" : self.id,
+            "email" :  self.email,
+            "password" : self.password,
+            "is_active" : self.is_active,
+            "empresa" : self.empresa,
+            "phone" : self.phone,
+            "firstName" : self.firstName,
+            "lastName" : self.lastName,
+            "run" : self.run
+        }
+
     def serialize_with_products(self):
         return{
             "id" : self.id,
