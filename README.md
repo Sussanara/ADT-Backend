@@ -1,6 +1,4 @@
-## Database en proceso...
+## Documentación lista!
 
-Se logró completar el método GET para recibir a todos los usuarios
-
-Método POST para agregar productos funcionando...
+https://documenter.getpostman.com/view/22372119/VUjMqSgY
     
