@@ -1,3 +1,4 @@
+from crypt import methods
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from models import db,Admin, User, Product
@@ -142,8 +143,25 @@ def get_product_by_id(id,product_id):
         user = User.query.get(id)
         return jsonify(user.serialize_with_products()),200
 
+#Edit Product by ID
+@app.route('api/users/products/<int:product_id>', methods = ['PUT'])
+def edit_product_by_id(product_id):
+    if request.method == 'PUT':
+        new_name = request.json.get('name')
+        new_stock = request.json.get('stock')
+        new_sold_stock = request.json.get('sold_stock')
+        new_price = request.json.get('price')
 
+        product = Product.query.get(product_id)
 
+        product.name = new_name
+        product.stock = new_stock
+        product.sold_stock = new_sold_stock
+        product.price = new_price
+
+        product.update()
+
+        return jsonify(product.serialize()),200
 
 if __name__ == '__main__':
     app.run()
