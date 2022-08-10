@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, JWTManager, create_refresh_token
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db,Admin, User, Product
 from flask_cors import CORS
+
 app = Flask(__name__)
 app.config['DEBUG'] = True
 app.config['ENV'] = 'development'
@@ -14,7 +14,6 @@ app.config['JSON_SORT_KEYS'] = False
 
 db.init_app(app)
 Migrate(app,db)
-jwt = JWTManager(app)
 CORS(app)
 
 #GET ALL ADMINS
