@@ -38,7 +38,7 @@ def get_and_post_users_with_products():
     if request.method == 'POST':
         user = User()
         user.email = request.json.get('email')
-        user.password = request.json.get('password')
+        user.password = generate_password_hash(request.json.get('password'))
         user.empresa = request.json.get('empresa')
         user.phone = request.json.get('phone')
         user.firstName = request.json.get('firstName')
@@ -65,7 +65,7 @@ def get_edit_postProduct_user_by_id(id):
         user = User.query.get(id)
 
         user.email = request.json.get('email')
-        user.password = request.json.get('password')
+        user.password = generate_password_hash(request.json.get('password'))
         user.empresa = request.json.get('empresa')
         user.phone = request.json.get('phone')
         user.firstName = request.json.get('firstName')
