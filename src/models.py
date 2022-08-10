@@ -87,6 +87,7 @@ class Product(db.Model):
     stock  = db.Column(db.Integer, nullable = False)
     sold_stock = db.Column(db.Integer, nullable = False)
     price = db.Column(db.Integer, nullable = False)
+    is_active = db.Column(db.Boolean, default = True)
 
     def serialize(self):
         return{
@@ -95,7 +96,8 @@ class Product(db.Model):
             "name" : self.name,
             "stock" : self.stock,
             "sold_stock" : self.sold_stock,
-            "price" : self.price
+            "price" : self.price,
+            "is_active" : self.is_active
         }
 
     def save(self):

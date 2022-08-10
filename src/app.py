@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, JWTManager, create_refresh_token
+from werkzeug.security import generate_password_hash, check_password_hash
 from models import db,Admin, User, Product
 from flask_cors import CORS
 app = Flask(__name__)
@@ -7,10 +9,12 @@ app.config['DEBUG'] = True
 app.config['ENV'] = 'development'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['JWT_SECRET_KEY'] = '6c5c61586204fadea58b8be931023960'
 app.config['JSON_SORT_KEYS'] = False
 
 db.init_app(app)
 Migrate(app,db)
+jwt = JWTManager(app)
 CORS(app)
 
 #GET ALL ADMINS
@@ -19,7 +23,7 @@ def admin_list():
     if request.method == 'GET':
         admins = Admin.query.all()
         admins = list(map(lambda admin: admin.serialize(),admins))
-        return jsonify(admins)
+        return jsonify(admins),200
 
 #GET ALL USERS /// POST USER
 @app.route('/api/users', methods = ['GET','POST'])
@@ -59,25 +63,16 @@ def get_edit_postProduct_user_by_id(id):
     
     #Edit User
     if request.method == 'PUT':
-        new_email = request.json.get('email')
-        new_password = request.json.get('password')
-        new_empresa = request.json.get('empresa')
-        new_phone = request.json.get('phone')
-        new_firstName = request.json.get('firstName')
-        new_lastName = request.json.get('lastName')
-        new_run = request.json.get('run')
-        new_is_active = request.json.get('is_active')
-
         user = User.query.get(id)
 
-        user.email = new_email
-        user.password = new_password
-        user.empresa = new_empresa
-        user.phone = new_phone
-        user.firstName = new_firstName
-        user.lastName = new_lastName
-        user.run = new_run
-        user.is_active = new_is_active
+        user.email = request.json.get('email')
+        user.password = request.json.get('password')
+        user.empresa = request.json.get('empresa')
+        user.phone = request.json.get('phone')
+        user.firstName = request.json.get('firstName')
+        user.lastName = request.json.get('lastName')
+        user.run = request.json.get('run')
+        user.is_active = request.json.get('is_active')
         
         user.update()
         users = User.query.all()
@@ -87,7 +82,7 @@ def get_edit_postProduct_user_by_id(id):
         user = User.query.get(id)
         user.delete()
         all_users = User.query.all()
-        return jsonify(list(map(lambda user: user.serialize(),all_users)))
+        return jsonify(list(map(lambda user: user.serialize(),all_users))),200
 
     #Post Product
     if request.method == 'POST':
