@@ -1,4 +1,3 @@
-from crypt import methods
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from models import db,Admin, User, Product
@@ -144,7 +143,7 @@ def get_product_by_id(id,product_id):
         return jsonify(user.serialize_with_products()),200
 
 #Edit Product by ID
-@app.route('api/users/products/<int:product_id>', methods = ['PUT'])
+@app.route('/api/users/products/<int:product_id>', methods = ['PUT'])
 def edit_product_by_id(product_id):
     if request.method == 'PUT':
         new_name = request.json.get('name')
