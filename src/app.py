@@ -55,7 +55,7 @@ def get_edit_postProduct_user_by_id(id):
     #Get User by ID
     if request.method == 'GET':
         user = User.query.get(id)
-        return jsonify(user.serialize()),200
+        return jsonify(user.serialize_with_products()),200
     
     #Edit User
     if request.method == 'PUT':
