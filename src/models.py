@@ -65,7 +65,8 @@ class User(db.Model):
             "name": product.name, 
             "stock": product.stock, 
             "sold_stock": product.sold_stock,
-            "price": product.price
+            "price": product.price,
+            "is_active": product.is_active
         },self.products))
 
     def save(self):
