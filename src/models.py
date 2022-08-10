@@ -8,12 +8,14 @@ class Admin(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     email = db.Column(db.String(200), nullable = False , unique = True )
     password = db.Column(db.String(200), nullable = False)
+    is_active = db.Column(db.Boolean, default = True)
 
     def serialize(self):
         return {
             "id": self.id,
             "email": self.email,
-            "password" : self.password
+            "password" : self.password,
+            "is_active" : self.is_active
         }
 
 class User(db.Model):
