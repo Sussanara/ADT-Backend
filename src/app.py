@@ -27,9 +27,14 @@ def admin_list():
         return jsonify(admins),200
 
     if request.method == 'POST':
+        email = request.json.get('email')
+        password = request.json.get('password')
+        #Comprobacion de Datos...
+        if not email: return jsonify({"msg" : "Email is required."}),400
+        if not password: return jsonify({"msg" : "Password is required."}),400
         admin = Admin()
-        admin.email = request.json.get('email')
-        admin.password =  generate_password_hash(request.json.get('password'))
+        admin.email = email
+        admin.password  = password
         admin.save()
         admin_list = Admin.query.all()
         return jsonify(list(map(lambda admin: admin.serialize(),admin_list))),200
