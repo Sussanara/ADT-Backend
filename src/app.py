@@ -4,7 +4,6 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db,Admin, User, Product
 from flask_cors import CORS
-from collections.abc import Mapping #testing...
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
