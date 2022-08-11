@@ -50,7 +50,7 @@ def login():
             "msg" : "Successful Login",
             "is_admin" : False,
             "token" : access_token,
-            "data" : user.serialize()
+            "user" : user.serialize()
         }
         return jsonify(output),200
 
@@ -62,7 +62,7 @@ def login():
             "msg" : "Successful admin login",
             "is_admin" : True,
             "token" : access_token,
-            "data" : admin_check.serialize()
+            "user" : admin_check.serialize()
         }
         return jsonify(output),200
 
