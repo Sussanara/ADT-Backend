@@ -27,11 +27,10 @@ def admin_list():
         return jsonify(admins),200
 
     if request.method == 'POST':
-        admins = Admin()
-        email = request.json.get(email)
-        password =  generate_password_hash(request.json.get(password))
-        is_active = request.json.get(is_active)
-        admins.save()
+        admin = Admin()
+        admin.email = request.json.get('email')
+        admin.password =  generate_password_hash(request.json.get('password'))
+        admin.save()
         admin_list = Admin.query.all()
         return jsonify(list(map(lambda admin: admin.serialize(),admin_list))),200
 
