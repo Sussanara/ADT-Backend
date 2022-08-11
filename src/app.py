@@ -91,6 +91,7 @@ def get_edit_postProduct_user_by_id(id):
         product.stock = request.json.get('stock')
         product.sold_stock = request.json.get('sold_stock')
         product.price = request.json.get('price')
+        product.is_active = request.json.get('is_active')
 
         product.save()
         user = User.query.get(id)
