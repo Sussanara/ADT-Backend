@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, JWTManager, create_refresh_token
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db,Admin, User, Product
 from flask_cors import CORS
@@ -15,6 +16,7 @@ app.config['JSON_SORT_KEYS'] = False
 db.init_app(app)
 Migrate(app,db)
 CORS(app)
+jwt = JWTManager(app)
 
 #GET ALL ADMINS
 @app.route('/api/admin', methods = ['GET'])
@@ -23,6 +25,52 @@ def admin_list():
         admins = Admin.query.all()
         admins = list(map(lambda admin: admin.serialize(),admins))
         return jsonify(admins),200
+
+#LOGIN ROUTE
+
+@app.route('/api/login', methods = ['POST'])
+def login():
+    email = request.json.get('email')
+    password =  request.json.get('password')
+    #Comprobaciones datos ingresados
+    if not email: return jsonify({"msg" : "Email is required."}),400
+    if not password: return jsonify({"msg" : "Password is required."}),400
+
+    admin_check = Admin.query.filter_by(email = email).first()
+    if not admin_check:
+        user = User.query.filter_by(email = email, is_active = True).first()
+
+        if not user: return jsonify({"status" : "failed" , "msg" : "Username/Password are incorrect."}), 401
+        if not check_password_hash(user.password,password): return jsonify({"status" : "failed" , "msg" : "Password is incorrect. Try again."}), 401
+
+        access_token = create_access_token(identity=user.id)
+
+        output = {
+            "status" : "success",
+            "msg" : "Successful Login",
+            "is_admin" : False,
+            "token" : access_token,
+            "data" : user.serialize()
+        }
+        return jsonify(output),200
+
+    else:
+        if not check_password_hash(admin_check.password,password): return jsonify({"status" : "failed", "msg" : "Admin Password is incorrect. Try again."}),401
+        access_token = create_access_token(identity=admin_check.id)
+        output = {
+            "status" : "success",
+            "msg" : "Successful admin login",
+            "is_admin" : True,
+            "token" : access_token,
+            "data" : admin_check.serialize()
+        }
+        return jsonify(output),200
+
+    
+    
+    
+
+
 
 #GET ALL USERS /// POST USER
 @app.route('/api/users', methods = ['GET','POST'])
