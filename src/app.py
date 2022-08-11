@@ -4,6 +4,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db,Admin, User, Product
 from flask_cors import CORS
+import datetime
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
@@ -52,12 +53,13 @@ def login():
 
     admin_check = Admin.query.filter_by(email = email).first()
     if not admin_check:
-        user = User.query.filter_by(email = email, is_active = True).first()
-
+        #USER LOGIN --------------------------------------------
+        user = User.query.filter_by(email = email).first()
         if not user: return jsonify({"status" : "failed" , "msg" : "Username/Password are incorrect."}), 401
         if not check_password_hash(user.password,password): return jsonify({"status" : "failed" , "msg" : "Password is incorrect. Try again."}), 401
-
-        access_token = create_access_token(identity=user.id)
+        if not user.is_active : return jsonify({"status" : "failed", "msg" : "User is not active."}),401
+        token_expiration = datetime.timedelta(minutes=3)
+        access_token = create_access_token(identity=user.id, expires_delta=token_expiration)
 
         output = {
             "status" : "success",
@@ -69,8 +71,10 @@ def login():
         return jsonify(output),200
 
     else:
+        #ADMIN LOGIN --------------------------------------------
         if not check_password_hash(admin_check.password,password): return jsonify({"status" : "failed", "msg" : "Admin Password is incorrect. Try again."}),401
-        access_token = create_access_token(identity=admin_check.id)
+        admin_token_expiration = datetime.timedelta(minutes=10)
+        access_token = create_access_token(identity=admin_check.id, expires_delta=admin_token_expiration)
         output = {
             "status" : "success",
             "msg" : "Successful admin login",
@@ -88,6 +92,7 @@ def login():
 
 #GET ALL USERS /// POST USER
 @app.route('/api/users', methods = ['GET','POST'])
+@jwt_required()
 def get_and_post_users_with_products():
 
     #GET ALL USERS
@@ -116,6 +121,7 @@ def get_and_post_users_with_products():
 
 #GET USER BY ID , EDIT USER, POST PRODUCT , DELETE USER
 @app.route('/api/users/<int:id>', methods = ['GET','POST','PUT','DELETE'])
+@jwt_required()
 def get_edit_postProduct_user_by_id(id):
     #Get User by ID
     if request.method == 'GET':
@@ -162,6 +168,7 @@ def get_edit_postProduct_user_by_id(id):
 
 #GET USER and PRODUCTS by ID
 @app.route('/api/users/<int:id>/products', methods = ['GET'])
+@jwt_required()
 def get_products_by_user(id):
     if request.method == 'GET':
         user = User.query.get(id)
@@ -170,6 +177,7 @@ def get_products_by_user(id):
     
 #GET PRODUCT by ID , AND EDIT PRODUCT by ID , DELETE PRODUCT by ID
 @app.route('/api/users/<int:id>/products/<int:product_id>', methods = ['GET','PUT','DELETE'])
+@jwt_required()
 def get_product_by_id(id,product_id):
     if request.method == 'GET':
         product = Product.query.get(product_id)
@@ -197,6 +205,7 @@ def get_product_by_id(id,product_id):
 
 #Edit Product by ID
 @app.route('/api/users/products/<int:product_id>', methods = ['PUT'])
+@jwt_required()
 def edit_product_by_id(product_id):
     if request.method == 'PUT':
         product = Product.query.get(product_id)
