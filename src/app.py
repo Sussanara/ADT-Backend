@@ -114,17 +114,13 @@ def get_product_by_id(id,product_id):
         return jsonify(product.serialize()),200
     
     if request.method == 'PUT':
-        new_name = request.json.get('name')
-        new_stock = request.json.get('stock')
-        new_sold_stock = request.json.get('sold_stock')
-        new_price = request.json.get('price')
-
         product = Product.query.get(product_id)
 
-        product.name = new_name
-        product.stock = new_stock
-        product.sold_stock = new_sold_stock
-        product.price = new_price
+        product.name = request.json.get('name')
+        product.stock = request.json.get('stock')
+        product.sold_stock = request.json.get('sold_stock')
+        product.price = request.json.get('price')
+        product.is_active = request.json.get('is_active')
 
         product.update()
         user = User.query.get(id)
@@ -141,17 +137,13 @@ def get_product_by_id(id,product_id):
 @app.route('/api/users/products/<int:product_id>', methods = ['PUT'])
 def edit_product_by_id(product_id):
     if request.method == 'PUT':
-        new_name = request.json.get('name')
-        new_stock = request.json.get('stock')
-        new_sold_stock = request.json.get('sold_stock')
-        new_price = request.json.get('price')
-
         product = Product.query.get(product_id)
 
-        product.name = new_name
-        product.stock = new_stock
-        product.sold_stock = new_sold_stock
-        product.price = new_price
+        product.name = request.json.get('name')
+        product.stock = request.json.get('stock')
+        product.sold_stock = request.json.get('sold_stock')
+        product.price = request.json.get('price')
+        product.is_active = request.json.get('is_active')
 
         product.update()
 
