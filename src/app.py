@@ -58,7 +58,7 @@ def login():
         if not user: return jsonify({"status" : "failed" , "msg" : "Username/Password are incorrect."}), 401
         if not check_password_hash(user.password,password): return jsonify({"status" : "failed" , "msg" : "Password is incorrect. Try again."}), 401
         if not user.is_active : return jsonify({"status" : "failed", "msg" : "User is not active."}),401
-        token_expiration = datetime.timedelta(minutes=3)
+        token_expiration = datetime.timedelta(days=1)
         access_token = create_access_token(identity=user.id, expires_delta=token_expiration)
 
         output = {
@@ -73,7 +73,7 @@ def login():
     else:
         #ADMIN LOGIN --------------------------------------------
         if not check_password_hash(admin_check.password,password): return jsonify({"status" : "failed", "msg" : "Admin Password is incorrect. Try again."}),401
-        admin_token_expiration = datetime.timedelta(minutes=10)
+        admin_token_expiration = datetime.timedelta(days=1)
         access_token = create_access_token(identity=admin_check.id, expires_delta=admin_token_expiration)
         output = {
             "status" : "success",
