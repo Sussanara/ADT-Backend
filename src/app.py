@@ -28,7 +28,6 @@ def admin_list():
 
     if request.method == 'POST':
         admins = Admin()
-        id = request.json.get(id)
         email = request.json.get(email)
         password =  generate_password_hash(request.json.get(password))
         is_active = request.json.get(is_active)
