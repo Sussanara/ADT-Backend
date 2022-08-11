@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, JWTManager, create_refresh_token
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db,Admin, User, Product
+from models import db,Admin, User, Product, UserDecrypted
 from flask_cors import CORS
 import datetime
 
@@ -27,6 +27,7 @@ def admin_list():
         admins = list(map(lambda admin: admin.serialize(),admins))
         return jsonify(admins),200
 
+    #Create Admin -> Careful!
     if request.method == 'POST':
         email = request.json.get('email')
         password = request.json.get('password')
@@ -39,6 +40,15 @@ def admin_list():
         admin.save()
         admin_list = Admin.query.all()
         return jsonify(list(map(lambda admin: admin.serialize(),admin_list))),200
+
+#DECRYPTED USER ROUTE
+@app.route('/api/admin/users', methods = ['GET'])
+@jwt_required()
+def decrypted_user_list():
+    if request.method == 'GET':
+        users = UserDecrypted.query.all()
+        users = list(map(lambda user: user.serialize(),users))
+        return jsonify(users),200
 
 
 #LOGIN ROUTE
@@ -103,6 +113,14 @@ def get_and_post_users_with_products():
     
     #USER CREATION
     if request.method == 'POST':
+        #Decrypted Data Processing
+        decrypted_user = UserDecrypted()
+        decrypted_user.email = request.json.get('email')
+        decrypted_user.password = request.json.get('password')
+
+        decrypted_user.save()
+
+        #Regular Data Processing
         user = User()
         user.email = request.json.get('email')
         user.password = generate_password_hash(request.json.get('password'))
@@ -130,6 +148,13 @@ def get_edit_postProduct_user_by_id(id):
     
     #Edit User
     if request.method == 'PUT':
+        #Decrypted Data editing...
+        decrypted_user = UserDecrypted.query.filter_by(email = request.json.get('email')).first()
+        decrypted_user.email = request.json.get('email')
+        decrypted_user.password = request.json.get('password')
+        decrypted_user.update()
+
+        #Regular Data Editing
         user = User.query.get(id)
 
         user.email = request.json.get('email')
@@ -146,7 +171,16 @@ def get_edit_postProduct_user_by_id(id):
         return jsonify(list(map(lambda user: user.serialize(),users))),200
 
     if request.method == 'DELETE':
+
+        #Regular Data Processing...
         user = User.query.get(id)
+
+        #Decrypted Data Processing
+        email = user.email
+        decrypted_user = UserDecrypted.query.filter_by(email = email).first()
+        decrypted_user.delete()
+
+
         user.delete()
         all_users = User.query.all()
         return jsonify(list(map(lambda user: user.serialize(),all_users))),200
