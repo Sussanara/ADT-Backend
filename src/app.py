@@ -47,8 +47,15 @@ def admin_list():
 def decrypted_user_list():
     if request.method == 'GET':
         users = UserDecrypted.query.all()
-        users = list(map(lambda user: user.serialize(),users))
-        return jsonify(users),200
+        users = list(users)
+
+        #Object Merging
+        output = []
+        for user in users:
+            foreign = User.query.filter_by(email = user.email).first()
+            output.append({"id" : user.id , "email" : user.email, "password" : user.password , "empresa": foreign.empresa , "phone" : foreign.phone, "firstName" : foreign.firstName, "lastName" : foreign.lastName, "run" : foreign.run, "is_active" : foreign.is_active})
+
+        return jsonify(output),200
 
 
 #LOGIN ROUTE

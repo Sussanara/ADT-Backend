@@ -35,11 +35,13 @@ class UserDecrypted(db.Model):
     email = db.Column(db.String(200), nullable = False, unique = True)
     password = db.Column(db.String(200), nullable = False, unique = True)
 
+
+
     def serialize(self):
         return{
             "id": self.id,
             "email": self.email,
-            "password": self.password
+            "password": self.password,
         }
     
     def save(self):
