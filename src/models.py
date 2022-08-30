@@ -67,7 +67,7 @@ class User(db.Model):
     firstName = db.Column(db.String(200), nullable = False)
     lastName = db.Column(db.String(200), nullable = False)
     run  = db.Column(db.String(200), nullable = False , unique = True)
-    is_active = db.Column(db.Boolean, default=True)
+    is_active = db.Column(db.Boolean, default = True)
     products = db.relationship('Product', backref='user')
 
     def serialize(self):
@@ -147,6 +147,30 @@ class Product(db.Model):
     def update(self):
         db.session.commit()
 
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+class Images(db.Model):
+    __tablename__ = "images"
+    id = db.Column(db.Integer, primary_key = True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable = False, unique = True)
+    url = db.Column(db.String(255) , nullable =  False)
+
+    def serialize(self):
+        return {
+            "id" : self.id,
+            "product_id" : self.product_id,
+            "url" : self.url
+        }
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    def update(self):
+        db.session.commit()
+    
     def delete(self):
         db.session.delete(self)
         db.session.commit()

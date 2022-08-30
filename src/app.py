@@ -1,9 +1,18 @@
+from itertools import product
 from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, JWTManager, create_refresh_token
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db,Admin, User, Product, UserDecrypted
+from models import db,Admin, User, Product, UserDecrypted,Images
 from flask_cors import CORS
+import cloudinary
+cloudinary.config( 
+  cloud_name = "diyqwze9g", 
+  api_key = "287765888235726", 
+  api_secret = "pQcrDhyVdmyoPYIrCcuSh3bo4yM" 
+)
+import cloudinary.uploader
+import cloudinary.api
 import datetime
 
 app = Flask(__name__)
@@ -18,6 +27,7 @@ db.init_app(app)
 Migrate(app,db)
 CORS(app)
 jwt = JWTManager(app)
+
 
 #GET ALL ADMINS
 @app.route('/api/admin', methods = ['GET','POST'])
@@ -260,6 +270,31 @@ def edit_product_by_id(product_id):
         product.update()
 
         return jsonify(product.serialize()),200
+
+#Image related routes -> REMEMBER TO ADD JWT AUTH later...
+#Get ALL Images and its respective product ID, and POST image.
+@app.route('/api/users/images', methods = ['GET','POST'])
+def get_and_post_images():
+    if request.method == 'POST':
+        product_id = request.form['product_id']
+        image = request.files['image']
+
+        response = cloudinary.uploader.upload(image, folder="businessInventory")
+        if not response : return jsonify({"msg" : "upload failed"}),400
+
+        new_image = Images(product_id=product_id, url = response["secure_url"])
+        new_image.save()
+        return jsonify(new_image.serialize()),200
+    
+    if request.method == 'GET':
+        images = Images().query.all()
+        return(jsonify(list(map(lambda image: image.serialize(),images)))),200
+
+#Get IMAGE URL by product ID
+@app.route('/api/users/images/<int:product_id>', methods = ['GET'])
+def get_image_by_id(product_id):
+    image = Images().query.get(product_id)
+    return jsonify(image.serialize()),200
 
 if __name__ == '__main__':
     app.run()
