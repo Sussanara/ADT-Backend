@@ -277,8 +277,11 @@ def edit_product_by_id(product_id):
 def get_and_post_images():
     if request.method == 'POST':
         product_id = request.form['product_id']
+        imageTables = Images().query.get(product_id)
+        if imageTables : return jsonify({"msg" : "User already exists!"}),400
         image = request.files['image']
 
+        #Image Uploading to CLOUDINARY
         response = cloudinary.uploader.upload(image, folder="businessInventory")
         if not response : return jsonify({"msg" : "upload failed"}),400
 
@@ -291,10 +294,22 @@ def get_and_post_images():
         return(jsonify(list(map(lambda image: image.serialize(),images)))),200
 
 #Get IMAGE URL by product ID
-@app.route('/api/users/images/<int:product_id>', methods = ['GET'])
-def get_image_by_id(product_id):
-    image = Images().query.get(product_id)
-    return jsonify(image.serialize()),200
+@app.route('/api/users/images/<int:product_id>', methods = ['GET','PUT'])
+def get_edit_remove_image_by_id(product_id):
+    if request.method == 'GET':
+        image = Images().query.get(product_id)
+        return jsonify(image.serialize()),200
+    
+    if request.method == 'PUT':
+        image = Images().query.get(product_id)
+        new_image = request.files['image']
+        #Image Uploading to CLOUDINARY
+        response = cloudinary.uploader.upload(new_image, folder="businessInventory")
+        if not response : return jsonify({"msg" : "upload failed"}),400
+
+        image.url = response["secure_url"]
+        image.update()
+        return jsonify(image.serialize()),200
 
 if __name__ == '__main__':
     app.run()
