@@ -122,6 +122,7 @@ class User(db.Model):
 class Product(db.Model):
     __tablename__ = 'product'
     id = db.Column(db.Integer, primary_key = True)
+    image = db.relationship('Images',backref='product',uselist=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String(200), nullable = False)
     stock  = db.Column(db.Integer, nullable = False)
@@ -129,16 +130,25 @@ class Product(db.Model):
     price = db.Column(db.Integer, nullable = False)
     is_active = db.Column(db.Boolean, default = True)
 
+    def validate_url(self):
+        if self.image:
+            return self.image.url
+        else:
+            return ""
+    
+
     def serialize(self):
         return{
             "id" : self.id,
             "owner_id" : self.owner_id,
+            "url" : self.validate_url(),
             "name" : self.name,
             "stock" : self.stock,
             "sold_stock" : self.sold_stock,
             "price" : self.price,
             "is_active" : self.is_active
         }
+
 
     def save(self):
         db.session.add(self)
