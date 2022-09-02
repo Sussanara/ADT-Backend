@@ -98,15 +98,7 @@ class User(db.Model):
         }
     
     def get_products(self):
-        return list(map(lambda product: 
-        {
-            "id": product.id,
-            "name": product.name, 
-            "stock": product.stock, 
-            "sold_stock": product.sold_stock,
-            "price": product.price,
-            "is_active": product.is_active
-        },self.products))
+        return list(map(lambda product: product.serialize(),self.products))
 
     def save(self):
         db.session.add(self)
