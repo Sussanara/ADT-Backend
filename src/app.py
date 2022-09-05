@@ -75,22 +75,22 @@ def login():
     email = request.json.get('email')
     password =  request.json.get('password')
     #Comprobaciones datos ingresados
-    if not email: return jsonify({"msg" : "Email is required."}),400
-    if not password: return jsonify({"msg" : "Password is required."}),400
+    if not email: return jsonify({"msg" : "Falta un Email!"}),400
+    if not password: return jsonify({"msg" : "Falta una contraseña!"}),400
 
     admin_check = Admin.query.filter_by(email = email).first()
     if not admin_check:
         #USER LOGIN --------------------------------------------
         user = User.query.filter_by(email = email).first()
-        if not user: return jsonify({"status" : "failed" , "msg" : "Username/Password are incorrect."}), 401
-        if not check_password_hash(user.password,password): return jsonify({"status" : "failed" , "msg" : "Password is incorrect. Try again."}), 401
-        if not user.is_active : return jsonify({"status" : "failed", "msg" : "User is not active."}),401
+        if not user: return jsonify({"status" : "failed" , "msg" : "Email o Contraseña estan incorrectos."}), 401
+        if not check_password_hash(user.password,password): return jsonify({"status" : "failed" , "msg" : "La contraseña es incorrecta. Intenta nuevamente."}), 401
+        if not user.is_active : return jsonify({"status" : "failed", "msg" : "El Usuario no está activo."}),401
         token_expiration = datetime.timedelta(days=1)
         access_token = create_access_token(identity=user.id, expires_delta=token_expiration)
 
         output = {
             "status" : "success",
-            "msg" : "Successful Login",
+            "msg" : "Inicio de sesión exitoso.",
             "is_admin" : False,
             "token" : access_token,
             "user" : user.serialize()
@@ -104,7 +104,7 @@ def login():
         access_token = create_access_token(identity=admin_check.id, expires_delta=admin_token_expiration)
         output = {
             "status" : "success",
-            "msg" : "Successful admin login",
+            "msg" : "Inicio de Sesión como Admin exitoso.",
             "is_admin" : True,
             "token" : access_token,
             "user" : admin_check.serialize()
