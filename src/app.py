@@ -42,8 +42,8 @@ def admin_list():
         email = request.json.get('email')
         password = request.json.get('password')
         #Comprobacion de Datos...
-        if not email: return jsonify({"msg" : "Email is required."}),400
-        if not password: return jsonify({"msg" : "Password is required."}),400
+        if not email: return jsonify({"msg" : "Falta un Email!"}),400
+        if not password: return jsonify({"msg" : "Falta una contraseña!"}),400
         admin = Admin()
         admin.email = email
         admin.password  = generate_password_hash(password)
