@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, JWTManager, create_refresh_token
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db,Admin, User, Product, UserDecrypted,Images
+from models import db,Admin, User, Product, UserDecrypted
 from flask_cors import CORS
 import cloudinary
 cloudinary.config( 
@@ -273,43 +273,32 @@ def edit_product_by_id(product_id):
 
 #Image related routes -> REMEMBER TO ADD JWT AUTH later...
 #Get ALL Images and its respective product ID, and POST image.
-@app.route('/api/users/images', methods = ['GET','POST'])
+@app.route('/api/users/images', methods = ['GET','PUT'])
 def get_and_post_images():
-    if request.method == 'POST':
+    if request.method == 'PUT':
         product_id = request.form['product_id']
-        imageTables = Images().query.get(product_id)
-        if imageTables : return jsonify({"msg" : "User already exists!"}),400
         image = request.files['image']
 
         #Image Uploading to CLOUDINARY
         response = cloudinary.uploader.upload(image, folder="businessInventory")
         if not response : return jsonify({"msg" : "upload failed"}),400
 
-        new_image = Images(product_id=product_id, url = response["secure_url"])
-        new_image.save()
-        return jsonify(new_image.serialize()),200
+        product = Product().query.get(product_id)
+        product.url = response["secure_url"]
+        
+        product.update()
+        return jsonify(product.serialize()),200
     
     if request.method == 'GET':
-        images = Images().query.all()
+        images = Product().query.all()
         return(jsonify(list(map(lambda image: image.serialize(),images)))),200
 
 #Get IMAGE URL by product ID
-@app.route('/api/users/images/<int:product_id>', methods = ['GET','PUT'])
+@app.route('/api/users/images/<int:product_id>', methods = ['GET'])
 def get_edit_remove_image_by_id(product_id):
     if request.method == 'GET':
-        image = Images().query.get(product_id)
-        return jsonify(image.serialize()),200
-    
-    if request.method == 'PUT':
-        image = Images().query.get(product_id)
-        new_image = request.files['image']
-        #Image Uploading to CLOUDINARY
-        response = cloudinary.uploader.upload(new_image, folder="businessInventory")
-        if not response : return jsonify({"msg" : "upload failed"}),400
-
-        image.url = response["secure_url"]
-        image.update()
-        return jsonify(image.serialize()),200
+        product = Product().query.get(product_id)
+        return jsonify(product.serialize()),200
 
 if __name__ == '__main__':
     app.run()
