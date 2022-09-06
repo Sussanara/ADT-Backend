@@ -76,6 +76,7 @@ def login():
     password =  request.json.get('password')
     #Comprobaciones datos ingresados
     if not email: return jsonify({"msg" : "Falta un Email!"}),400
+    if "@" in email: return jsonify({"msg" : "Email invalido!"}),400
     if not password: return jsonify({"msg" : "Falta una contraseña!"}),400
 
     admin_check = Admin.query.filter_by(email = email).first()
