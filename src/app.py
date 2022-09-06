@@ -100,7 +100,7 @@ def login():
 
     else:
         #ADMIN LOGIN --------------------------------------------
-        if not check_password_hash(admin_check.password,password): return jsonify({"status" : "failed", "msg" : "Admin Password is incorrect. Try again."}),401
+        if not check_password_hash(admin_check.password,password): return jsonify({"status" : "failed", "msg" : "Por favor ingrese la contraseña correcta."}),401
         admin_token_expiration = datetime.timedelta(days=1)
         access_token = create_access_token(identity=admin_check.id, expires_delta=admin_token_expiration)
         output = {
